@@ -1,14 +1,4 @@
-<<<<<<< HEAD
  {
- "name": "tailwind-build",
-=======
-{
-  "name": "tailwind-build",
->>>>>>> 48da6e03e779d445b519a6461ec3f86133b983a8
-  "version": "1.0.0",
-  "scripts": {
-    "build": "npx tailwindcss -i ./input.css -o ./output.css --minify"
-  },
   "devDependencies": {
     "tailwindcss": "^3.4.17"
   }
