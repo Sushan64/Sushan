@@ -788,6 +788,10 @@ video {
   height: 100%;
 }
 
+.h-fit {
+  height: fit-content;
+}
+
 .h-screen {
   height: 100vh;
 }
@@ -843,6 +847,11 @@ video {
 .max-w-sm {
   max-width: 24rem;
 }
+
+.w-fit {
+  width: fit-content;
+}
+
 
 .flex-shrink-0 {
   flex-shrink: 0;
