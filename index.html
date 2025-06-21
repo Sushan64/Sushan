@@ -52,7 +52,7 @@
 </noscript>
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<!--<script src="https://www.google.com/recaptcha/api.js" async defer></script>-->
     
     
     <!-- JSON-LD snippet -->
@@ -617,10 +617,9 @@
                             <textarea rows=5 class="text-white rounded-md p-3 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 border border-transparent focus:ring-0" id="message" name="message" required></textarea>
                             
                         </div>
+                        <div id="recaptcha-container"></div>
                         <button type="submit" class="bg-orange-600 hover:bg-orange-500 active:bg-orange-700 p-3">Send Message</button>
-                        
-                        <div type="submit" data-sitekey="6Lc0TmUrAAAAAP6_wNz0bt5ohrZVnKM6EKMrdiqb" class="g-recaptcha" data-callback="onSubmit" data-size="invisible"></div>
-                    </form>
+                         </form>
                 </div>
                 <div>
                     <h3 class="text-2xl text-center mb-8 font-['Michroma','sans-serif']">Get In Touch</h3>
@@ -790,45 +789,77 @@
         type();
         
         
-        // EmailJs
+        // EmailJs & reCAPTCHA lazy load
         // Content Form
-        (function() {
-            emailjs.init({
-                publicKey: "48G3HL1d9Z3E1V4q0",
-            });
-        })();
-        
-        const form = document.getElementById('contact-form');
-        
-        function onSubmit(token) {
-            
-            emailjs.sendForm('service_bly3hfl', 'template_di2tooj', form)
-                .then(() => {
-                    alert("Message sent successfully!");
-                    form.reset()
-                }, (error) => {
-                    alert("Failed to send message. Error: " + JSON.stringify(error));
-                })
-                .finally(() => {
-                    grecaptcha.reset();
-                });
-        }
-        window.onSubmit = onSubmit;
-        
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            
-            // Validate the form
-            if (form.checkValidity()) {
-                //If the form is valid, execute the reCAPTCHA.
-                grecaptcha.execute();
-            } else {
-                //If the form is invalid, display the browser's validation messages.
-                form.reportValidity();
-            }
-        }
-        form.addEventListener('submit', handleFormSubmit);
-        
+        (function () {
+    emailjs.init({
+      publicKey: "48G3HL1d9Z3E1V4q0",
+    });
+  })();
+
+  const form = document.getElementById("contact-form");
+  let captchaWidgetId = null;
+
+  // Lazy load reCAPTCHA script
+  function loadRecaptcha() {
+    if (window.grecaptcha) return;
+
+    const script = document.createElement("script");
+    script.src = "https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoaded&render=explicit";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+
+  // Load reCAPTCHA when form is touched or user scrolls
+  window.addEventListener("scroll", loadRecaptcha, { once: true });
+  form?.addEventListener("focusin", loadRecaptcha, { once: true });
+
+  // When reCAPTCHA is ready
+  window.onRecaptchaLoaded = function () {
+    captchaWidgetId = grecaptcha.render("recaptcha-container", {
+      sitekey: "6Lc0TmUrAAAAAP6_wNz0bt5ohrZVnKM6EKMrdiqb",
+      size: "invisible",
+      callback: onSubmit,
+    });
+  };
+
+  // Callback after reCAPTCHA success
+  function onSubmit(token) {
+      console.log("reCAPTCHA token:", token);  
+    emailjs
+      .sendForm("service_bly3hfl", "template_di2tooj", form)
+      .then(() => {
+        alert("Message sent successfully!");
+        form.reset();
+      })
+      .catch((error) => {
+        alert("Failed to send message. Error: " + JSON.stringify(error));
+      })
+      .finally(() => {
+        grecaptcha.reset(captchaWidgetId);
+      });
+  }
+
+  window.onSubmit = onSubmit;
+
+  // Hook form submit
+  function handleFormSubmit(event) {
+    event.preventDefault();
+
+    if (form.checkValidity()) {
+      if (grecaptcha && captchaWidgetId !== null) {
+        grecaptcha.execute(captchaWidgetId);
+      } else {
+        alert("reCAPTCHA is still loading...");
+      }
+    } else {
+      form.reportValidity();
+    }
+  }
+
+  form.addEventListener("submit", handleFormSubmit);
+
         });
 </script>
 </body>
