@@ -833,15 +833,17 @@ Z
     </main>
     <footer class="p-4 bg-gray-800">
         <p class="text-center text-sm text-gray-500">
-            © 2025 Sushan Khatiwada. All rights reserved.
+            © <span id="c-year"></span> Sushan Khatiwada. All rights reserved.
         </p>
         <p class="text-center text-xs text-gray-500">
-            Last updated on Jun, 2025
+            Last updated on Jun, 2026
         </p>
     </footer>
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const cYear = document.getElementById('c-year')
+            cYear.textContent = new Date().getFullYear()
             const floating = document.getElementById("floating-socials");
             const merged = document.getElementById("merged-socials");
             
